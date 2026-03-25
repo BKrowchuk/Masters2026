@@ -1,0 +1,349 @@
+[
+  {
+    "name": "Scottie Scheffler",
+    "group": 1
+  },
+  {
+    "name": "Rory McIlroy",
+    "group": 1
+  },
+  {
+    "name": "Ludvig Åberg",
+    "group": 1
+  },
+  {
+    "name": "Xander Schauffele",
+    "group": 1
+  },
+  {
+    "name": "Collin Morikawa",
+    "group": 1
+  },
+  {
+    "name": "Hideki Matsuyama",
+    "group": 1
+  },
+  {
+    "name": "Justin Thomas",
+    "group": 2
+  },
+  {
+    "name": "Viktor Hovland",
+    "group": 2
+  },
+  {
+    "name": "Jon Rahm",
+    "group": 2
+  },
+  {
+    "name": "Brooks Koepka",
+    "group": 2
+  },
+  {
+    "name": "Russell Henley",
+    "group": 2
+  },
+  {
+    "name": "Sepp Straka",
+    "group": 3
+  },
+  {
+    "name": "Patrick Cantlay",
+    "group": 3
+  },
+  {
+    "name": "Keegan Bradley",
+    "group": 3
+  },
+  {
+    "name": "Tommy Fleetwood",
+    "group": 3
+  },
+  {
+    "name": "Shane Lowry",
+    "group": 3
+  },
+  {
+    "name": "Bryson DeChambeau",
+    "group": 4
+  },
+  {
+    "name": "Tyrrell Hatton",
+    "group": 4
+  },
+  {
+    "name": "Corey Conners",
+    "group": 4
+  },
+  {
+    "name": "Billy Horschel",
+    "group": 4
+  },
+  {
+    "name": "Thomas Detry",
+    "group": 5
+  },
+  {
+    "name": "Akshay Bhatia",
+    "group": 5
+  },
+  {
+    "name": "Min Woo Lee",
+    "group": 5
+  },
+  {
+    "name": "Sahith Theegala",
+    "group": 5
+  },
+  {
+    "name": "Cameron Smith",
+    "group": 5
+  },
+  {
+    "name": "Sungjae Im",
+    "group": 5
+  },
+  {
+    "name": "Aaron Rai",
+    "group": 6
+  },
+  {
+    "name": "Nick Taylor",
+    "group": 6
+  },
+  {
+    "name": "Tom Kim",
+    "group": 6
+  },
+  {
+    "name": "Lucas Glover",
+    "group": 6
+  },
+  {
+    "name": "J.J. Spaun",
+    "group": 6
+  },
+  {
+    "name": "Patrick Reed",
+    "group": 6
+  },
+  {
+    "name": "Jason Day",
+    "group": 7
+  },
+  {
+    "name": "Tony Finau",
+    "group": 7
+  },
+  {
+    "name": "Byeong Hun An",
+    "group": 7
+  },
+  {
+    "name": "Harris English",
+    "group": 7
+  },
+  {
+    "name": "Sam Burns",
+    "group": 7
+  },
+  {
+    "name": "Adam Scott",
+    "group": 7
+  },
+  {
+    "name": "Justin Rose",
+    "group": 8
+  },
+  {
+    "name": "Stephan Jaeger",
+    "group": 8
+  },
+  {
+    "name": "Max Greyserman",
+    "group": 8
+  },
+  {
+    "name": "Denny McCarthy",
+    "group": 8
+  },
+  {
+    "name": "Taylor Pendrith",
+    "group": 8
+  },
+  {
+    "name": "Brian Harman",
+    "group": 9
+  },
+  {
+    "name": "Daniel Berger",
+    "group": 9
+  },
+  {
+    "name": "Nico Echavarria",
+    "group": 9
+  },
+  {
+    "name": "J.T. Poston",
+    "group": 9
+  },
+  {
+    "name": "Davis Thompson",
+    "group": 9
+  },
+  {
+    "name": "Tom Hoge",
+    "group": 10
+  },
+  {
+    "name": "Rasmus Højgaard",
+    "group": 10
+  },
+  {
+    "name": "Christiaan Bezuidenhout",
+    "group": 10
+  },
+  {
+    "name": "Michael Kim",
+    "group": 10
+  },
+  {
+    "name": "Matthieu Pavon",
+    "group": 10
+  },
+  {
+    "name": "Will Zalatoris",
+    "group": 11
+  },
+  {
+    "name": "Cameron Young",
+    "group": 11
+  },
+  {
+    "name": "Joe Highsmith",
+    "group": 11
+  },
+  {
+    "name": "Cam Davis",
+    "group": 11
+  },
+  {
+    "name": "Matt McCarty",
+    "group": 11
+  },
+  {
+    "name": "Jordan Spieth",
+    "group": 12
+  },
+  {
+    "name": "Max Homa",
+    "group": 12
+  },
+  {
+    "name": "Nicolai Højgaard",
+    "group": 12
+  },
+  {
+    "name": "Matt Fitzpatrick",
+    "group": 12
+  },
+  {
+    "name": "Joaquin Niemann",
+    "group": 13
+  },
+  {
+    "name": "Rafael Campos",
+    "group": 13
+  },
+  {
+    "name": "Patton Kizzire",
+    "group": 13
+  },
+  {
+    "name": "Adam Schenk",
+    "group": 13
+  },
+  {
+    "name": "Davis Riley",
+    "group": 13
+  },
+  {
+    "name": "Zach Johnson",
+    "group": 14
+  },
+  {
+    "name": "Phil Mickelson",
+    "group": 14
+  },
+  {
+    "name": "Charl Schwartzel",
+    "group": 14
+  },
+  {
+    "name": "Dustin Johnson",
+    "group": 14
+  },
+  {
+    "name": "Danny Willett",
+    "group": 14
+  },
+  {
+    "name": "Sergio Garcia",
+    "group": 14
+  },
+  {
+    "name": "Justin Hastings (a)",
+    "group": 15
+  },
+  {
+    "name": "Vijay Singh",
+    "group": 15
+  },
+  {
+    "name": "Bernhard Langer",
+    "group": 15
+  },
+  {
+    "name": "Bubba Watson",
+    "group": 15
+  },
+  {
+    "name": "Kevin Yu",
+    "group": 15
+  },
+  {
+    "name": "Hiroshi Tai (a)",
+    "group": 15
+  },
+  {
+    "name": "Ángel Cabrera",
+    "group": 15
+  },
+  {
+    "name": "Fred Couples",
+    "group": 15
+  },
+  {
+    "name": "Evan Beck (a)",
+    "group": 15
+  },
+  {"name":"Matt McCarty","group":11},
+
+{"name":"Brian Campbell","group":13},
+{"name":"Maverick McNealy","group":3},
+{"name":"Chris Kirk","group":12},
+{"name":"Mike Weir","group":15},
+{"name":"Austin Eckroat","group":10},
+{"name":"Jhonattan Vegas","group":11},
+{"name":"Robert MacIntyre","group":4},
+
+{"name":"Laurie Canter","group":9},
+
+{"name":"Thriston Lawrence","group":12},
+{"name":"Noah Kent (a)","group":15},
+{"name":"Jose Luis Ballester Barrio (a)","group":15},
+{"name":"José María Olazábal","group":15},
+
+{"name":"Nick Dunlap","group":8}
+
+] 
