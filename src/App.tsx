@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -28,6 +29,8 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Button,
+  Avatar,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HistoryIcon from '@mui/icons-material/History';
@@ -38,10 +41,18 @@ import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import GroupIcon from '@mui/icons-material/Group';
+import GolfCourseIcon from '@mui/icons-material/GolfCourse';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { mockPoolMembers } from './data/mockData';
 import { pastResults } from './data/pastResults';
 import { GolferScore } from './types';
 import { mastersLeaderboard, MastersPlayer } from './data/mastersLeaderboard';
+import { useAuth } from './contexts/AuthContext';
+import LoginPage from './pages/LoginPage';
+import PicksPage from './pages/PicksPage';
+import AdminPage from './pages/AdminPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import React from 'react';
 
 const StyledAccordion = styled(Accordion)<{ condensed?: boolean }>(({ theme, condensed }) => ({
@@ -1126,12 +1137,14 @@ function sortByScore(a: GolferScore, b: GolferScore): number {
   return (a.total as number) - (b.total as number);
 }
 
-function App() {
+function MainApp() {
   const [activeTab, setActiveTab] = useState(0);
   const [sortByScore, setSortByScore] = useState(true);
   const [groupByGroup, setGroupByGroup] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -1229,7 +1242,7 @@ function App() {
             <Tooltip title={groupByGroup ? "Show players sorted by position" : "Group players by their group number"} placement="top">
               <IconButton
                 onClick={handleGroupToggle}
-                sx={{ 
+                sx={{
                   color: '#006747',
                   '&:hover': {
                     backgroundColor: 'rgba(0, 103, 71, 0.1)',
@@ -1239,6 +1252,39 @@ function App() {
                 <GroupIcon />
               </IconButton>
             </Tooltip>
+          )}
+          <Divider orientation="vertical" flexItem />
+          {user ? (
+            <>
+              <Tooltip title="My Picks" placement="top">
+                <IconButton onClick={() => navigate('/picks')} sx={{ color: '#006747', '&:hover': { backgroundColor: 'rgba(0, 103, 71, 0.1)' } }}>
+                  <GolfCourseIcon />
+                </IconButton>
+              </Tooltip>
+              {profile?.is_admin && (
+                <Tooltip title="Admin" placement="top">
+                  <IconButton onClick={() => navigate('/admin')} sx={{ color: '#006747', '&:hover': { backgroundColor: 'rgba(0, 103, 71, 0.1)' } }}>
+                    <AdminPanelSettingsIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title={`Sign out (${profile?.nickname ?? ''})`} placement="top">
+                <IconButton onClick={signOut} sx={{ color: '#006747', '&:hover': { backgroundColor: 'rgba(0, 103, 71, 0.1)' } }}>
+                  <Avatar sx={{ width: 26, height: 26, bgcolor: '#006747', fontSize: '0.75rem' }}>
+                    {(profile?.nickname ?? '?')[0].toUpperCase()}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <Button
+              onClick={() => navigate('/login')}
+              size="small"
+              variant="contained"
+              sx={{ bgcolor: '#006747', '&:hover': { bgcolor: '#005238' }, fontSize: '0.75rem', py: 0.5 }}
+            >
+              Sign In
+            </Button>
           )}
         </Box>
         <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', justifyContent: 'center', width: '100%' }}>
@@ -1306,10 +1352,59 @@ function App() {
                 <ListItemText>{groupByGroup ? "Sort by Position" : "Group by Group Number"}</ListItemText>
               </MenuItem>
             )}
+            <Divider />
+            {user ? (
+              <>
+                <MenuItem onClick={() => { navigate('/picks'); handleClose(); }}>
+                  <ListItemIcon><GolfCourseIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>My Picks ({profile?.nickname ?? ''})</ListItemText>
+                </MenuItem>
+                {profile?.is_admin && (
+                  <MenuItem onClick={() => { navigate('/admin'); handleClose(); }}>
+                    <ListItemIcon><AdminPanelSettingsIcon fontSize="small" /></ListItemIcon>
+                    <ListItemText>Admin</ListItemText>
+                  </MenuItem>
+                )}
+                <MenuItem onClick={() => { signOut(); handleClose(); }}>
+                  <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Sign Out</ListItemText>
+                </MenuItem>
+              </>
+            ) : (
+              <MenuItem onClick={() => { navigate('/login'); handleClose(); }}>
+                <ListItemIcon><GolfCourseIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>Sign In / My Picks</ListItemText>
+              </MenuItem>
+            )}
           </Menu>
         </Box>
       </NavigationBox>
     </AppContainer>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/picks"
+        element={
+          <ProtectedRoute>
+            <PicksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/*" element={<MainApp />} />
+    </Routes>
   );
 }
 
