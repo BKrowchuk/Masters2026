@@ -12,12 +12,20 @@ export interface PastResult {
 
 export const pastResults: PastResult[] = [
   {
-    year: 2025,
+    year: 2026,
     champion: "?",
-    secondPlace: "",
+    secondPlace: "?",
     thirdPlace: "",
     comments: "",
     description: ""
+  },
+  {
+    year: 2025,
+    champion: "Luther",
+    secondPlace: "L Dough",
+    thirdPlace: "Caleb Ellis Island",
+    comments: "Luther by 2, L Dough alone in second",
+    description: "Luther makes it 4 out of 5 and ties the goose for all time wins, L Dough has a moving day to remember and secures second over Caleb, Krow gets another participation ribbon"
   },
   {
     year: 2024,
