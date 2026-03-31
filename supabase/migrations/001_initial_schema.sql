@@ -1,5 +1,5 @@
 -- Masters Pool 2026 — initial schema
--- Run this in your Supabase SQL editor
+-- Run this in your Supabase SQL editor (safe to re-run)
 
 -- ============================================================
 -- 1. Profiles — one row per auth user, stores the nickname
@@ -14,17 +14,17 @@ create table if not exists profiles (
 -- Row-level security
 alter table profiles enable row level security;
 
--- Anyone authenticated can read all profiles (needed for leaderboard nicknames)
+drop policy if exists "profiles_select_authenticated" on profiles;
 create policy "profiles_select_authenticated"
   on profiles for select
   using (auth.role() = 'authenticated');
 
--- Users can only update their own profile
+drop policy if exists "profiles_update_own" on profiles;
 create policy "profiles_update_own"
   on profiles for update
   using (auth.uid() = id);
 
--- Only service role (admin API) can insert profiles
+drop policy if exists "profiles_insert_service_role" on profiles;
 create policy "profiles_insert_service_role"
   on profiles for insert
   with check (auth.role() = 'service_role');
@@ -46,16 +46,17 @@ create table if not exists picks (
 -- Row-level security
 alter table picks enable row level security;
 
--- Anyone authenticated can read all picks (visible on leaderboard)
+drop policy if exists "picks_select_authenticated" on picks;
 create policy "picks_select_authenticated"
   on picks for select
   using (auth.role() = 'authenticated');
 
--- Users can only insert/update their own picks
+drop policy if exists "picks_insert_own" on picks;
 create policy "picks_insert_own"
   on picks for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "picks_update_own" on picks;
 create policy "picks_update_own"
   on picks for update
   using (auth.uid() = user_id);
