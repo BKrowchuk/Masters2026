@@ -31,6 +31,8 @@ import {
   Divider,
   Button,
   Avatar,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HistoryIcon from '@mui/icons-material/History';
@@ -44,14 +46,14 @@ import GroupIcon from '@mui/icons-material/Group';
 import GolfCourseIcon from '@mui/icons-material/GolfCourse';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { mockPoolMembers } from './data/mockData';
-import { pastResults } from './data/pastResults';
 import { GolferScore } from './types';
-import { mastersLeaderboard, MastersPlayer } from './data/mastersLeaderboard';
+import type { MastersPlayer } from './data/mastersLeaderboard';
+import { useTournament } from './contexts/TournamentContext';
 import { useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
 import PicksPage from './pages/PicksPage';
 import AdminPage from './pages/AdminPage';
+import SetPasswordPage from './pages/SetPasswordPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import React from 'react';
 
@@ -360,6 +362,7 @@ function formatRoundPosition(position: { position: number | 'CUT'; isTied: boole
 }
 
 function PastResults() {
+  const { pastResults } = useTournament();
   // Split results into old and new format
   const oldFormatResults = pastResults.filter(result => result.year < 2023);
   const newFormatResults = pastResults.filter(result => result.year >= 2023);
@@ -572,15 +575,16 @@ function PastResults() {
 };
 
 const PicksTable = () => {
+  const { poolMembers } = useTournament();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Get all unique groups
-  const groups = Array.from(new Set(mockPoolMembers.flatMap(member => 
+  const groups = Array.from(new Set(poolMembers.flatMap(member =>
     member.picks.map(pick => pick.group)
   ))).sort((a, b) => a - b);
 
   // Filter pool members based on search term
-  const filteredMembers = mockPoolMembers.filter(member => {
+  const filteredMembers = poolMembers.filter(member => {
     const memberName = member.name.toLowerCase();
     const picks = member.picks.map(pick => pick.name.toLowerCase());
     return memberName.includes(searchTerm.toLowerCase()) || 
@@ -740,6 +744,7 @@ const PicksTable = () => {
 };
 
 const PoolLeaderboard = ({ sortByScore }: { sortByScore: boolean }) => {
+  const { poolMembers } = useTournament();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [isCondensed, setIsCondensed] = useState(true);
 
@@ -753,7 +758,7 @@ const PoolLeaderboard = ({ sortByScore }: { sortByScore: boolean }) => {
 
   // Pre-sort the members
   const sortedMembers = React.useMemo(() => {
-    return mockPoolMembers
+    return [...poolMembers]
       .sort((a, b) => {
         // First sort by cut status - non-cut players come first
         if (a.isCut !== b.isCut) {
@@ -762,7 +767,7 @@ const PoolLeaderboard = ({ sortByScore }: { sortByScore: boolean }) => {
         // If both are cut or both are not cut, sort by total
         return a.bestFourTotal - b.bestFourTotal;
       });
-  }, []);
+  }, [poolMembers]);
 
   // Pre-sort the golfers for each member and identify best 8
   const sortedGolfers = React.useMemo(() => {
@@ -968,6 +973,7 @@ const PoolLeaderboard = ({ sortByScore }: { sortByScore: boolean }) => {
 };
 
 const MastersLeaderboard = ({ groupByGroup }: { groupByGroup: boolean }) => {
+  const { leaderboard: mastersLeaderboard } = useTournament();
   const sortedLeaderboard = [...mastersLeaderboard].sort((a, b) => {
     if (groupByGroup) {
       // First sort by group, putting dash group at the bottom
@@ -1145,6 +1151,7 @@ function MainApp() {
   const open = Boolean(anchorEl);
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { loading, error } = useTournament();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -1175,10 +1182,22 @@ function MainApp() {
     <AppContainer>
       <LeaderboardContainer>
         <Box sx={{ flex: 1, overflow: 'hidden' }}>
-          {activeTab === 0 && <PoolLeaderboard sortByScore={sortByScore} />}
-          {activeTab === 1 && <PastResults />}
-          {activeTab === 2 && <PicksTable />}
-          {activeTab === 3 && <MastersLeaderboard groupByGroup={groupByGroup} />}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <CircularProgress sx={{ color: '#006747' }} />
+            </Box>
+          ) : error ? (
+            <Box sx={{ p: 2 }}>
+              <Alert severity="error">{error}</Alert>
+            </Box>
+          ) : (
+            <>
+              {activeTab === 0 && <PoolLeaderboard sortByScore={sortByScore} />}
+              {activeTab === 1 && <PastResults />}
+              {activeTab === 2 && <PicksTable />}
+              {activeTab === 3 && <MastersLeaderboard groupByGroup={groupByGroup} />}
+            </>
+          )}
         </Box>
       </LeaderboardContainer>
       <NavigationBox>
@@ -1387,6 +1406,14 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/set-password"
+        element={
+          <ProtectedRoute allowPasswordChange>
+            <SetPasswordPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/picks"
         element={

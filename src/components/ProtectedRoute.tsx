@@ -5,10 +5,11 @@ import { Box, CircularProgress } from '@mui/material';
 type Props = {
   children: React.ReactNode;
   adminOnly?: boolean;
+  allowPasswordChange?: boolean;
 };
 
-export default function ProtectedRoute({ children, adminOnly = false }: Props) {
-  const { user, profile, loading } = useAuth();
+export default function ProtectedRoute({ children, adminOnly = false, allowPasswordChange = false }: Props) {
+  const { user, profile, loading, mustChangePassword } = useAuth();
 
   if (loading) {
     return (
@@ -19,6 +20,7 @@ export default function ProtectedRoute({ children, adminOnly = false }: Props) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
+  if (mustChangePassword && !allowPasswordChange) return <Navigate to="/set-password" replace />;
   if (adminOnly && !profile?.is_admin) return <Navigate to="/" replace />;
 
   return <>{children}</>;

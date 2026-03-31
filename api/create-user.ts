@@ -32,33 +32,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  const { nickname, password } = req.body as { nickname: string; password: string };
-  if (!nickname || !password) {
-    return res.status(400).json({ error: 'nickname and password are required' });
+  const { nickname, password } = req.body as { nickname: string; password?: string };
+  if (!nickname) {
+    return res.status(400).json({ error: 'nickname is required' });
   }
 
+  const tempPassword = password || Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
   const email = `${nickname.toLowerCase().replace(/\s+/g, '_')}@masterspool.app`;
 
   const { data, error: createError } = await supabaseAdmin.auth.admin.createUser({
     email,
-    password,
+    password: tempPassword,
     email_confirm: true,
-    user_metadata: { nickname },
+    user_metadata: { nickname, must_change_password: true },
   });
 
   if (createError) {
     return res.status(400).json({ error: createError.message });
   }
 
-  const { error: profileError } = await supabaseAdmin.from('profiles').insert({
-    id: data.user.id,
-    nickname,
-    is_admin: false,
-  });
+  // The DB trigger handle_new_auth_user auto-creates the profile row.
+  // Wait briefly and verify it was created.
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('id', data.user.id)
+    .single();
 
-  if (profileError) {
-    return res.status(500).json({ error: profileError.message });
+  if (!profile) {
+    return res.status(500).json({ error: 'Profile was not created by trigger' });
   }
 
-  return res.status(200).json({ success: true, userId: data.user.id });
+  return res.status(200).json({ success: true, userId: data.user.id, tempPassword });
 }

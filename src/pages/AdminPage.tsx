@@ -33,11 +33,11 @@ export default function AdminPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -56,26 +56,45 @@ export default function AdminPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!nickname || !password) return;
+    if (!nickname) return;
     setCreating(true);
     setCreateError(null);
+    setTempPassword(null);
 
-    const { data, error } = await fetch('/api/create-user', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-      },
-      body: JSON.stringify({ nickname: nickname.trim(), password }),
-    }).then((r) => r.json());
+    try {
+      const res = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify({ nickname: nickname.trim() }),
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        try {
+          setCreateError(JSON.parse(body).error ?? `Server error (${res.status})`);
+        } catch {
+          setCreateError(`Server error (${res.status}). Make sure you're running on Vercel.`);
+        }
+        setCreating(false);
+        return;
+      }
+      var result = await res.json();
+    } catch (err) {
+      setCreateError('Network error — the /api/create-user endpoint is only available when deployed to Vercel.');
+      setCreating(false);
+      return;
+    }
 
     setCreating(false);
-    if (error) {
-      setCreateError(error);
+    if (result.error) {
+      setCreateError(result.error);
     } else {
+      const created = nickname.trim();
       setNickname('');
-      setPassword('');
-      setSuccessMsg(`User "${nickname.trim()}" created.`);
+      setTempPassword(result.tempPassword);
+      setSuccessMsg(`User "${created}" created.`);
       setSuccessOpen(true);
       loadUsers();
     }
@@ -129,6 +148,12 @@ export default function AdminPage() {
               {createError}
             </Alert>
           )}
+          {tempPassword && (
+            <Alert severity="info" sx={{ mb: 2 }} onClose={() => setTempPassword(null)}>
+              <strong>Temporary password:</strong> {tempPassword}<br />
+              Share this with the user. They will be prompted to set their own password on first login.
+            </Alert>
+          )}
           <Box component="form" onSubmit={handleCreate} sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <TextField
               label="Nickname"
@@ -136,22 +161,13 @@ export default function AdminPage() {
               onChange={(e) => setNickname(e.target.value)}
               required
               size="small"
-              sx={{ flex: '1 1 160px' }}
+              sx={{ flex: '1 1 200px' }}
               helperText="Shown on the leaderboard"
-            />
-            <TextField
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              size="small"
-              sx={{ flex: '1 1 160px' }}
-              helperText="Share this with the user"
             />
             <Button
               type="submit"
               variant="contained"
-              disabled={creating || !nickname || !password}
+              disabled={creating || !nickname}
               sx={{ bgcolor: '#006747', '&:hover': { bgcolor: '#005238' }, alignSelf: 'flex-start', mt: 0.25 }}
             >
               {creating ? <CircularProgress size={20} sx={{ color: 'white' }} /> : 'Create'}

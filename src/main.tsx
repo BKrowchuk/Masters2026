@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx';
+import { TournamentProvider } from './contexts/TournamentContext.tsx';
 
 const theme = createTheme({
   palette: {
@@ -26,7 +27,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <App />
+          <TournamentProvider>
+            <App />
+          </TournamentProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

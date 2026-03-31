@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -9,30 +9,42 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function LoginPage() {
-  const [searchParams] = useSearchParams();
-  const [nickname, setNickname] = useState(searchParams.get('u') ?? '');
+export default function SetPasswordPage() {
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { signIn, user, mustChangePassword } = useAuth();
+  const { clearMustChangePassword } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user && mustChangePassword) navigate('/set-password', { replace: true });
-    else if (user) navigate('/picks', { replace: true });
-  }, [user, mustChangePassword, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
-    const { error } = await signIn(nickname.trim(), password);
+    const { error: updateError } = await supabase.auth.updateUser({
+      password,
+      data: { must_change_password: false },
+    });
     setLoading(false);
-    if (error) {
-      setError('Invalid nickname or password. Please try again.');
+
+    if (updateError) {
+      setError(updateError.message);
+    } else {
+      clearMustChangePassword();
+      navigate('/picks', { replace: true });
     }
   }
 
@@ -52,22 +64,13 @@ export default function LoginPage() {
         justifyContent: 'center',
       }}
     >
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          width: '100%',
-          maxWidth: 400,
-          mx: 2,
-          borderRadius: 2,
-        }}
-      >
+      <Paper elevation={6} sx={{ p: 4, width: '100%', maxWidth: 400, mx: 2, borderRadius: 2 }}>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <Typography variant="h5" sx={{ color: '#006747', fontWeight: 'bold' }}>
-            Masters Pool 2026
+            Set Your Password
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Sign in to submit your picks
+            Choose a password you'll use going forward
           </Typography>
         </Box>
 
@@ -79,30 +82,29 @@ export default function LoginPage() {
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
-            label="Nickname"
-            fullWidth
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            required
-            autoFocus={!nickname}
-            sx={{ mb: 2 }}
-            inputProps={{ autoCapitalize: 'off', autoCorrect: 'off' }}
-          />
-          <TextField
-            label="Password"
+            label="New Password"
             type="password"
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            autoFocus={!!nickname}
+            autoFocus
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
             sx={{ mb: 3 }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            disabled={loading || !nickname || !password}
+            disabled={loading || !password || !confirm}
             sx={{
               backgroundColor: '#006747',
               '&:hover': { backgroundColor: '#005238' },
@@ -110,17 +112,9 @@ export default function LoginPage() {
               fontSize: '1rem',
             }}
           >
-            {loading ? <CircularProgress size={22} sx={{ color: 'white' }} /> : 'Sign In'}
+            {loading ? <CircularProgress size={22} sx={{ color: 'white' }} /> : 'Set Password'}
           </Button>
         </Box>
-
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mt: 3, textAlign: 'center' }}
-        >
-          Didn't receive credentials? Contact the pool admin.
-        </Typography>
       </Paper>
     </Box>
   );
